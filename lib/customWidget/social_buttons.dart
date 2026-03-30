@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
+import '../core/constants/app_strings.dart';
 
 class SocialButtons extends StatelessWidget {
   const SocialButtons({super.key});
@@ -7,9 +9,9 @@ class SocialButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _socialBtn("Facebook", Icons.facebook, Colors.blue)),
+        Expanded(child: _socialBtn(AppStrings.facebook, Icons.facebook, Colors.blue)),
         const SizedBox(width: 16),
-        Expanded(child: _socialBtn("Google", Icons.account_circle, Colors.red)),
+        Expanded(child: _socialBtn(AppStrings.google, Icons.account_circle, Colors.red)),
       ],
     );
   }
@@ -18,7 +20,7 @@ class SocialButtons extends StatelessWidget {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -29,7 +31,7 @@ class SocialButtons extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.black,
+              color: Colors.black87,
               fontWeight: FontWeight.bold,
             ),
           ),

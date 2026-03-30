@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth_screen.dart';
+import '../core/constants/app_colors.dart';
+import '../core/constants/app_strings.dart';
 
 class OnboardingContent {
   final String title;
@@ -26,21 +28,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingContent> _contents = [
     OnboardingContent(
-      title: 'Trade anytime anywhere',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
+      title: AppStrings.onboardingTitle1,
+      description: AppStrings.onboardingDescription,
       image: 'assets/onboarding1.png',
     ),
     OnboardingContent(
-      title: 'Save and invest at the same time',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
+      title: AppStrings.onboardingTitle2,
+      description: AppStrings.onboardingDescription,
       image: 'assets/onboarding2.png',
     ),
     OnboardingContent(
-      title: 'Transact fast and easy',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
+      title: AppStrings.onboardingTitle3,
+      description: AppStrings.onboardingDescription,
       image: 'assets/onboarding3.png',
     ),
   ];
@@ -54,9 +53,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF1E3C3F), // Dark Teal/Greyish
-              Color(0xFF111822), // Deep Navy
-              Color(0xFF0D1217), // Near Black
+              AppColors.onboardingGradient1,
+              AppColors.onboardingGradient2,
+              AppColors.onboardingGradient3,
             ],
             stops: [0.0, 0.4, 1.0],
           ),
@@ -92,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -102,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white.withOpacity(0.6),
+                              color: AppColors.white.withOpacity(0.6),
                               height: 1.5,
                             ),
                           ),
@@ -143,8 +142,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF60E0BA),
-                          foregroundColor: const Color(0xFF11181F),
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.background,
                           minimumSize: const Size(double.infinity, 56),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -153,8 +152,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         child: Text(
                           _currentPage == _contents.length - 1
-                              ? 'Get Started'
-                              : 'Next',
+                              ? AppStrings.getStarted
+                              : AppStrings.next,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -179,7 +178,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 8,
       width: 8,
       decoration: BoxDecoration(
-        color: _currentPage == index ? Colors.white : Colors.white.withOpacity(0.2),
+        color: _currentPage == index ? AppColors.white : AppColors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(4),
       ),
     );

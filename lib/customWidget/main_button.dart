@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
 
 class MainButton extends StatelessWidget {
   final String text;
@@ -17,7 +18,7 @@ class MainButton extends StatelessWidget {
       height: 56,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF60E0BA),
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -27,7 +28,7 @@ class MainButton extends StatelessWidget {
         child: Text(
           text,
           style: const TextStyle(
-            color: Color(0xFF11181F),
+            color: AppColors.background,
             fontWeight: FontWeight.bold,
             fontSize: 17,
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../customWidget/input_field.dart';
 import '../customWidget/main_button.dart';
 import '../customWidget/social_buttons.dart';
+import '../core/constants/app_strings.dart';
 
 class RegisterForm extends StatelessWidget {
   const RegisterForm({super.key});
@@ -13,29 +14,29 @@ class RegisterForm extends StatelessWidget {
         child: Column(
           key: const ValueKey("Register"),
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("Sign up", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
+          children: [
+            const Text(AppStrings.signUp, style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
 
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
-            InputField(label: "Name", hint: "Enter name"),
-            SizedBox(height: 20),
+            const InputField(label: AppStrings.name, hint: AppStrings.enterName),
+            const SizedBox(height: 20),
 
-            InputField(label: "Email", hint: "Enter email"),
-            SizedBox(height: 20),
+            const InputField(label: AppStrings.email, hint: AppStrings.enterEmail),
+            const SizedBox(height: 20),
 
-            InputField(label: "Password", hint: "Enter password", isPassword: true),
-            SizedBox(height: 20),
+            const InputField(label: AppStrings.password, hint: AppStrings.enterPassword, isPassword: true),
+            const SizedBox(height: 20),
 
-            InputField(label: "Confirm Password", hint: "Confirm password", isPassword: true),
+            const InputField(label: AppStrings.confirmPassword, hint: AppStrings.enterConfirmPassword, isPassword: true),
 
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-            MainButton(text: "Sign up"),
+            const MainButton(text: AppStrings.signUp),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            SocialButtons(),
+            const SocialButtons(),
           ],
         ),
       );

@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'screens/auth_screen.dart';
+
 import 'screens/onboarding_screen.dart';
+import 'core/constants/app_colors.dart';
+import 'core/constants/app_strings.dart';
 
 void main() {
   runApp(const CryptoTradeApp());
@@ -12,13 +15,13 @@ class CryptoTradeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Crypto Auth',
+      title: AppStrings.appTitle,
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF11181F),
-        primaryColor: const Color(0xFF60E0BA),
+        scaffoldBackgroundColor: AppColors.background,
+        primaryColor: AppColors.primary,
         fontFamily: 'Inter',
       ),
 

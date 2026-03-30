@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../forms/login_form.dart';
 import '../../forms/register_form.dart';
 import '../../customWidget/custom_button.dart';
+import '../core/constants/app_colors.dart';
+import '../core/constants/app_strings.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -11,7 +13,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  String selectedTab = "login";
+  String selectedTab = AppStrings.loginFlag;
 
   @override
   Widget build(BuildContext context) {
@@ -28,23 +30,23 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 54,
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A222B),
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: CustomButton(
-                        title: "Sign in",
-                        isSelected: selectedTab == "login",
-                        onTap: () => setState(() => selectedTab = "login"),
+                        title: AppStrings.signIn,
+                        isSelected: selectedTab == AppStrings.loginFlag,
+                        onTap: () => setState(() => selectedTab = AppStrings.loginFlag),
                       ),
                     ),
                     Expanded(
                       child: CustomButton(
-                        title: "Sign up",
-                        isSelected: selectedTab == "register",
-                        onTap: () => setState(() => selectedTab = "register"),
+                        title: AppStrings.signUp,
+                        isSelected: selectedTab == AppStrings.registerFlag,
+                        onTap: () => setState(() => selectedTab = AppStrings.registerFlag),
                       ),
                     ),
                   ],
@@ -57,7 +59,7 @@ class _AuthScreenState extends State<AuthScreen> {
               Expanded(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  child: selectedTab == "login"
+                  child: selectedTab == AppStrings.loginFlag
                       ? const LoginForm()
                       : const RegisterForm(),
                 ),

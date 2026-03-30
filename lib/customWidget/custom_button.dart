@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String title;
@@ -18,14 +19,14 @@ class CustomButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF222B34) : Colors.transparent,
+          color: isSelected ? AppColors.selectedTab : AppColors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         alignment: Alignment.center,
         child: Text(
           title,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey,
+            color: isSelected ? AppColors.white : Colors.grey,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

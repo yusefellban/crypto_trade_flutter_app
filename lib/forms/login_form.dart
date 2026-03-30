@@ -3,6 +3,7 @@ import '../customWidget/input_field.dart';
 import '../customWidget/main_button.dart';
 import '../customWidget/social_buttons.dart';
 import '../screens/settings_screen.dart';
+import '../core/constants/app_strings.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -15,19 +16,19 @@ class LoginForm extends StatelessWidget {
           key: const ValueKey("Login"),
           crossAxisAlignment: CrossAxisAlignment.start,
           children:  [
-            Text("Sign in", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
+            Text(AppStrings.signIn, style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
 
             SizedBox(height: 40),
 
-            InputField(label: "Email", hint: "Enter your email"),
+            InputField(label: AppStrings.email, hint: AppStrings.enterEmail),
             SizedBox(height: 20),
 
-            InputField(label: "Password", hint: "Enter password", isPassword: true),
+            InputField(label: AppStrings.password, hint: AppStrings.enterPassword, isPassword: true),
 
             SizedBox(height: 40),
 
             MainButton(
-              text: "Sign in",
+              text: AppStrings.signIn,
               onPressed: () {
                 Navigator.pushReplacement(
                   context,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_colors.dart';
 
 class InputField extends StatelessWidget {
   final String label;
@@ -21,12 +22,12 @@ class InputField extends StatelessWidget {
         const SizedBox(height: 10),
         TextField(
           obscureText: isPassword,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey[700]),
             filled: true,
-            fillColor: const Color(0xFF171D24),
+            fillColor: AppColors.inputBackground,
             suffixIcon: isPassword
                 ? Icon(Icons.visibility_off_outlined, color: Colors.grey[700])
                 : null,

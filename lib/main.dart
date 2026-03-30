@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/auth_screen.dart';
+import 'screens/onboarding_screen.dart';
 
 void main() {
   runApp(const CryptoTradeApp());
@@ -21,7 +22,7 @@ class CryptoTradeApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
 
-      home: const AuthScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }

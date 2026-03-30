@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../customWidget/input_field.dart';
 import '../customWidget/main_button.dart';
 import '../customWidget/social_buttons.dart';
+import '../screens/settings_screen.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -13,7 +14,7 @@ class LoginForm extends StatelessWidget {
         child: Column(
           key: const ValueKey("Login"),
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children:  [
             Text("Sign in", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
 
             SizedBox(height: 40),
@@ -25,8 +26,17 @@ class LoginForm extends StatelessWidget {
 
             SizedBox(height: 40),
 
-            MainButton(text: "Sign in"),
-
+            MainButton(
+              text: "Sign in",
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
+            ),
             SizedBox(height: 20),
 
             SocialButtons(),

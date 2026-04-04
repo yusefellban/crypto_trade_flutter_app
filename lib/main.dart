@@ -5,7 +5,11 @@ import 'screens/onboarding_screen.dart';
 import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
 
-void main() {
+import 'core/di/injection.dart' as di;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
   runApp(const CryptoTradeApp());
 }
 

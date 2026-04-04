@@ -1,32 +1,81 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 import 'profile_screen.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
+import '../core/di/injection.dart';
+import '../logic/cubits/home_cubit.dart';
+import '../logic/cubits/home_state.dart';
+import '../data/models/coin_model.dart';
+import '../data/models/trending_coin_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _HeaderSection(),
-            const SizedBox(height: 20),
-            const _FeaturesGrid(),
-            const SizedBox(height: 24),
-            const _PromotionSection(),
-            const SizedBox(height: 32),
-            const _CoinSection(title: AppStrings.recentCoin, isRecent: true),
-            const SizedBox(height: 32),
-            const _CoinSection(title: AppStrings.topCoins, isRecent: false),
-            const SizedBox(height: 120), // Space for bottom nav
-          ],
+    return BlocProvider(
+      create: (context) => sl<HomeCubit>()..fetchHomeData(),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
+            if (state is HomeLoading) {
+              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            } else if (state is HomeError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: AppColors.priceDown, size: 48),
+                    const SizedBox(height: 16),
+                    Text(state.message, style: const TextStyle(color: AppColors.white)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                      onPressed: () => context.read<HomeCubit>().fetchHomeData(),
+                      child: const Text('Try Again', style: TextStyle(color: AppColors.background)),
+                    ),
+                  ],
+                ),
+              );
+            } else if (state is HomeLoaded) {
+              return RefreshIndicator(
+                onRefresh: () => context.read<HomeCubit>().fetchHomeData(),
+                color: AppColors.primary,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _HeaderSection(),
+                      const SizedBox(height: 20),
+                      const _FeaturesGrid(),
+                      const SizedBox(height: 24),
+                      const _PromotionSection(),
+                      const SizedBox(height: 32),
+                      _CoinSection(
+                        title: AppStrings.recentCoin,
+                        trendingCoins: state.trendingCoins,
+                      ),
+                      const SizedBox(height: 32),
+                      _CoinSection(
+                        title: AppStrings.topCoins,
+                        topCoins: state.topCoins,
+                      ),
+                      const SizedBox(height: 120), // Space for bottom nav
+                    ],
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
@@ -228,12 +277,20 @@ class _PromotionCard extends StatelessWidget {
 
 class _CoinSection extends StatelessWidget {
   final String title;
-  final bool isRecent;
+  final List<CoinModel>? topCoins;
+  final List<TrendingCoinListItem>? trendingCoins;
 
-  const _CoinSection({required this.title, required this.isRecent});
+  const _CoinSection({
+    required this.title,
+    this.topCoins,
+    this.trendingCoins,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isTop = topCoins != null;
+    final count = isTop ? topCoins!.length : trendingCoins!.length;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -250,19 +307,37 @@ class _CoinSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 130,
+          height: 140,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
-            itemCount: 5,
+            itemCount: count,
             separatorBuilder: (context, index) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
-              return _CoinCard(
-                pair: index % 2 == 0 ? AppStrings.btcBusd : AppStrings.solBusd,
-                price: index % 2 == 0 ? '40,059.83' : '2,059.83',
-                change: index % 2 == 0 ? '+0.81%' : '-0.81%',
-                isUp: index % 2 == 0,
-              );
+              if (isTop) {
+                final coin = topCoins![index];
+                return _CoinCard(
+                  name: coin.name,
+                  symbol: coin.symbol.toUpperCase(),
+                  price: '\$${NumberFormat("#,##0.00").format(coin.currentPrice ?? 0)}',
+                  change: '${coin.priceChangePercentage24h?.toStringAsFixed(2)}%',
+                  isUp: (coin.priceChangePercentage24h ?? 0) >= 0,
+                  imageUrl: coin.image,
+                  sparkline: coin.sparklineIn7d?.price,
+                );
+              } else {
+                final item = trendingCoins![index].item!;
+                return _CoinCard(
+                  name: item.name,
+                  symbol: item.symbol.toUpperCase(),
+                  price: '\$${item.data?.price?.toStringAsFixed(4) ?? '0.00'}',
+                  change: '${item.data?.usdChange.toStringAsFixed(2)}%',
+                  isUp: (item.data?.usdChange ?? 0) >= 0,
+                  imageUrl: item.large,
+                  // Trending API provides a link for sparkline, but fl_chart needs points.
+                  // For trending we'll use a mocked line or skip if data not available.
+                );
+              }
             },
           ),
         ),
@@ -272,16 +347,22 @@ class _CoinSection extends StatelessWidget {
 }
 
 class _CoinCard extends StatelessWidget {
-  final String pair;
+  final String name;
+  final String symbol;
   final String price;
   final String change;
   final bool isUp;
+  final String imageUrl;
+  final List<double>? sparkline;
 
   const _CoinCard({
-    required this.pair,
+    required this.name,
+    required this.symbol,
     required this.price,
     required this.change,
     required this.isUp,
+    required this.imageUrl,
+    this.sparkline,
   });
 
   @override
@@ -300,22 +381,32 @@ class _CoinCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                price,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+              Expanded(
+                child: Text(
+                  price,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(Icons.currency_bitcoin_rounded, color: Colors.orange, size: 20),
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: 20,
+                height: 20,
+                placeholder: (context, url) => const SizedBox(width: 20, height: 20),
+                errorWidget: (context, url, error) => const Icon(Icons.error, size: 20),
+              ),
             ],
           ),
           const SizedBox(height: 4),
           Row(
             children: [
               Text(
-                pair,
+                symbol,
                 style: const TextStyle(color: AppColors.white, fontSize: 12),
               ),
               const SizedBox(width: 4),
@@ -327,10 +418,49 @@ class _CoinCard extends StatelessWidget {
           ),
           const Spacer(),
           SizedBox(
-            height: 30,
+            height: 35,
             width: double.infinity,
-            child: CustomPaint(
-              painter: _MockChartPainter(color: color),
+            child: sparkline != null
+                ? _SparklineChart(data: sparkline!, color: color)
+                : CustomPaint(painter: _MockChartPainter(color: color)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SparklineChart extends StatelessWidget {
+  final List<double> data;
+  final Color color;
+
+  const _SparklineChart({required this.data, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) return const SizedBox.shrink();
+
+    // Scale data for better visibility if needed, or just use as is
+    return LineChart(
+      LineChartData(
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
+        borderData: FlBorderData(show: false),
+        lineBarsData: [
+          LineChartBarData(
+            spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+            isCurved: true,
+            color: color,
+            barWidth: 2,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(show: false),
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [color.withOpacity(0.3), color.withOpacity(0)],
+              ),
             ),
           ),
         ],

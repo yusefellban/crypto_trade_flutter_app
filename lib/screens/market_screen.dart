@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../core/constants/app_colors.dart';
+import '../core/di/injection.dart';
+import '../logic/cubits/market_cubit.dart';
+import '../logic/cubits/market_state.dart';
+import '../data/models/coin_model.dart';
 import 'profile_screen.dart';
 
 class MarketScreen extends StatelessWidget {
@@ -7,75 +15,61 @@ class MarketScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            const _HeaderSection(),
-            const SizedBox(height: 20),
-            const _FilterTabs(),
-            const SizedBox(height: 24),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: const [
-                  _CoinListItem(
-                    name: 'Bitcoin',
-                    symbol: 'BTC',
-                    price: '32,697.05',
-                    change: '+0.81%',
-                    isPositive: true,
-                    assetPath: 'assets/bitcoin_ic.png',
-                  ),
-                  _CoinListItem(
-                    name: 'Chainlink',
-                    symbol: 'LINK',
-                    price: '32,697.05',
-                    change: '-0.81%',
-                    isPositive: false,
-                    assetPath: 'assets/app_ic.png', // Fallback for LINK
-                  ),
-                  _CoinListItem(
-                    name: 'Cardano',
-                    symbol: 'ADA',
-                    price: '32,697.05',
-                    change: '+0.81%',
-                    isPositive: true,
-                    assetPath: 'assets/cardano_ic.png',
-                  ),
-                  _CoinListItem(
-                    name: 'SHIBA INU',
-                    symbol: 'SHIB',
-                    price: '32,697.05',
-                    change: '-0.81%',
-                    isPositive: false,
-                    assetPath: 'assets/shiba_inu_ic.png',
-                  ),
-                  _CoinListItem(
-                    name: 'HIFI',
-                    symbol: 'MFT',
-                    price: '32,697.05',
-                    change: '-0.81%',
-                    isPositive: false,
-                    assetPath: 'assets/hifi_ic.png',
-                  ),
-                  _CoinListItem(
-                    name: 'REN',
-                    symbol: 'REN',
-                    price: '32,697.05',
-                    change: '+0.81%',
-                    isPositive: true,
-                    assetPath: 'assets/ren_ic.png',
-                  ),
-                  SizedBox(height: 16),
-                  _AddFavoriteButton(),
-                  SizedBox(height: 40),
-                ],
+    return BlocProvider(
+      create: (context) => sl<MarketCubit>()..fetchMarketData(),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              const _HeaderSection(),
+              const SizedBox(height: 20),
+              const _FilterTabs(),
+              const SizedBox(height: 24),
+              Expanded(
+                child: BlocBuilder<MarketCubit, MarketState>(
+                  builder: (context, state) {
+                    if (state is MarketLoading) {
+                      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                    } else if (state is MarketLoaded) {
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: state.coins.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == state.coins.length) {
+                            return const Column(
+                              children: [
+                                SizedBox(height: 16),
+                                _AddFavoriteButton(),
+                                SizedBox(height: 40),
+                              ],
+                            );
+                          }
+                          return _CoinListItem(coin: state.coins[index]);
+                        },
+                      );
+                    } else if (state is MarketError) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(state.message, style: const TextStyle(color: Colors.red)),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () => context.read<MarketCubit>().fetchMarketData(),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -112,11 +106,11 @@ class _HeaderSection extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          _IconContainer(icon: Icons.search_rounded),
+          const _IconContainer(icon: Icons.search_rounded),
           const SizedBox(width: 16),
-          _IconContainer(icon: Icons.crop_free_rounded), // Scan icon
+          const _IconContainer(icon: Icons.crop_free_rounded), // Scan icon
           const SizedBox(width: 16),
-          _IconContainer(icon: Icons.notifications_none_rounded),
+          const _IconContainer(icon: Icons.notifications_none_rounded),
         ],
       ),
     );
@@ -185,24 +179,14 @@ class _FilterTabsState extends State<_FilterTabs> {
 }
 
 class _CoinListItem extends StatelessWidget {
-  final String name;
-  final String symbol;
-  final String price;
-  final String change;
-  final bool isPositive;
-  final String assetPath;
+  final CoinModel coin;
 
-  const _CoinListItem({
-    required this.name,
-    required this.symbol,
-    required this.price,
-    required this.change,
-    required this.isPositive,
-    required this.assetPath,
-  });
+  const _CoinListItem({required this.coin});
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat.currency(symbol: r'$', decimalDigits: 2);
+    final isPositive = (coin.priceChangePercentage24h ?? 0) >= 0;
     final color = isPositive ? AppColors.priceUp : AppColors.priceDown;
 
     return Padding(
@@ -215,8 +199,17 @@ class _CoinListItem extends StatelessWidget {
               color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Image.asset(assetPath, width: 32, height: 32, errorBuilder: (_, __, ___) => 
-              Icon(Icons.currency_bitcoin, color: AppColors.primary)),
+            child: CachedNetworkImage(
+              imageUrl: coin.image,
+              width: 32,
+              height: 32,
+              placeholder: (context, url) => const SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+              ),
+              errorWidget: (context, url, error) => Icon(Icons.currency_bitcoin, color: AppColors.primary),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -225,12 +218,14 @@ class _CoinListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  coin.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Text(
-                  symbol,
-                  style: TextStyle(color: AppColors.grey, fontSize: 14),
+                  coin.symbol.toUpperCase(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 14),
                 ),
               ],
             ),
@@ -238,10 +233,45 @@ class _CoinListItem extends StatelessWidget {
           Expanded(
             flex: 2,
             child: SizedBox(
-              height: 30,
-              child: CustomPaint(
-                painter: _SparklinePainter(color: color),
-              ),
+              height: 35,
+              child: coin.sparklineIn7d != null && coin.sparklineIn7d!.price != null && coin.sparklineIn7d!.price!.isNotEmpty
+                  ? LineChart(
+                      LineChartData(
+                        gridData: const FlGridData(show: false),
+                        titlesData: const FlTitlesData(show: false),
+                        borderData: FlBorderData(show: false),
+                        minX: 0,
+                        maxX: (coin.sparklineIn7d!.price!.length - 1).toDouble(),
+                        minY: coin.sparklineIn7d!.price!.reduce((a, b) => a < b ? a : b) * 0.999,
+                        maxY: coin.sparklineIn7d!.price!.reduce((a, b) => a > b ? a : b) * 1.001,
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: coin.sparklineIn7d!.price!
+                                .asMap()
+                                .entries
+                                .map((e) => FlSpot(e.key.toDouble(), e.value))
+                                .toList(),
+                            isCurved: true,
+                            color: color,
+                            barWidth: 2,
+                            isStrokeCapRound: true,
+                            dotData: const FlDotData(show: false),
+                            belowBarData: BarAreaData(
+                              show: true,
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  color.withOpacity(0.3),
+                                  color.withOpacity(0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : const Center(child: Text('---', style: TextStyle(color: AppColors.grey))),
             ),
           ),
           const SizedBox(width: 16),
@@ -251,11 +281,11 @@ class _CoinListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  price,
+                  currencyFormatter.format(coin.currentPrice ?? 0),
                   style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Text(
-                  change,
+                  '${isPositive ? '+' : ''}${coin.priceChangePercentage24h?.toStringAsFixed(2) ?? '0.00'}%',
                   style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -265,48 +295,6 @@ class _CoinListItem extends StatelessWidget {
       ),
     );
   }
-}
-
-class _SparklinePainter extends CustomPainter {
-  final Color color;
-  _SparklinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path();
-    path.moveTo(0, size.height * 0.7);
-    path.quadraticBezierTo(size.width * 0.1, size.height * 0.6, size.width * 0.2, size.height * 0.82);
-    path.quadraticBezierTo(size.width * 0.3, size.height * 0.95, size.width * 0.4, size.height * 0.5);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.1, size.width * 0.6, size.height * 0.4);
-    path.quadraticBezierTo(size.width * 0.7, size.height * 0.6, size.width * 0.8, size.height * 0.2);
-    path.lineTo(size.width, size.height * 0.15);
-
-    canvas.drawPath(path, paint);
-
-    // Subtle gradient below
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [color.withOpacity(0.2), color.withOpacity(0)],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final fillPath = Path.from(path);
-    fillPath.lineTo(size.width, size.height);
-    fillPath.lineTo(0, size.height);
-    fillPath.close();
-
-    canvas.drawPath(fillPath, fillPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AddFavoriteButton extends StatelessWidget {

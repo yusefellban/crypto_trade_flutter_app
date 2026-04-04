@@ -5,12 +5,14 @@ class InputField extends StatelessWidget {
   final String label;
   final String hint;
   final bool isPassword;
+  final TextEditingController? controller;
 
   const InputField({
     super.key,
     required this.label,
     required this.hint,
     this.isPassword = false,
+    this.controller,
   });
 
   @override
@@ -21,6 +23,7 @@ class InputField extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
         const SizedBox(height: 10),
         TextField(
+          controller: controller,
           obscureText: isPassword,
           style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(

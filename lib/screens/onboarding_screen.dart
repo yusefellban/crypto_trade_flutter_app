@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'auth_screen.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
+import '../core/services/preference_service.dart';
+import '../core/di/injection.dart' as di;
 
 class OnboardingContent {
   final String title;
@@ -129,6 +131,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_currentPage == _contents.length - 1) {
+                            final preferenceService = di.sl<PreferenceService>();
+                            preferenceService.setOnboardingComplete();
+                            
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(

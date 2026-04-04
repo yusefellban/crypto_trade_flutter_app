@@ -13,7 +13,7 @@ class CoinDetailCubit extends Cubit<CoinDetailState> {
       final detail = await _repository.getCoinDetail(id);
       emit(CoinDetailLoaded(detail));
     } catch (e) {
-      emit(CoinDetailError("Failed to fetch coin details: ${e.toString()}"));
+      emit(CoinDetailError(e.toString()));
     }
   }
 }

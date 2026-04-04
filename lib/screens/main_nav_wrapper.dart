@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'market_screen.dart';
+import 'trades_screen.dart';
 import '../core/constants/app_colors.dart';
 
 class MainNavWrapper extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MainNavWrapperState extends State<MainNavWrapper> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const MarketScreen(),
-    const Center(child: Text('Trades')),
+    const TradesScreen(),
     const Center(child: Text('Activity')),
     const Center(child: Text('Wallets')),
   ];

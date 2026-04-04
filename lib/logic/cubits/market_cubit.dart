@@ -13,7 +13,7 @@ class MarketCubit extends Cubit<MarketState> {
       final coins = await _repository.getTopCoins();
       emit(MarketLoaded(coins: coins));
     } catch (e) {
-      emit(MarketError("Failed to fetch market data: ${e.toString()}"));
+      emit(MarketError(e.toString()));
     }
   }
 }

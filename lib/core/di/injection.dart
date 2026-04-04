@@ -5,6 +5,7 @@ import '../../data/repositories/home_repository.dart';
 import '../../data/repositories/coin_detail_repository.dart';
 import '../../logic/cubits/home_cubit.dart';
 import '../../logic/cubits/market_cubit.dart';
+import '../../logic/cubits/trades_cubit.dart';
 import '../../logic/cubits/coin_detail/coin_detail_cubit.dart';
 
 final sl = GetIt.instance;
@@ -23,5 +24,6 @@ Future<void> init() async {
   // Cubit
   sl.registerFactory(() => HomeCubit(sl()));
   sl.registerFactory(() => MarketCubit(sl()));
+  sl.registerFactory(() => TradesCubit(sl()));
   sl.registerFactory(() => CoinDetailCubit(sl()));
 }

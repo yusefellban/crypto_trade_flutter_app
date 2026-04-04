@@ -18,7 +18,7 @@ class HomeCubit extends Cubit<HomeState> {
         trendingCoins: trendingResponse.coins ?? [],
       ));
     } catch (e) {
-      emit(HomeError("Failed to fetch data: ${e.toString()}"));
+      emit(HomeError(e.toString()));
     }
   }
 }

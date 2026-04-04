@@ -13,6 +13,7 @@ import '../logic/cubits/home_cubit.dart';
 import '../logic/cubits/home_state.dart';
 import '../data/models/coin_model.dart';
 import '../data/models/trending_coin_model.dart';
+import 'coin_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -324,6 +325,14 @@ class _CoinSection extends StatelessWidget {
                   isUp: (coin.priceChangePercentage24h ?? 0) >= 0,
                   imageUrl: coin.image,
                   sparkline: coin.sparklineIn7d?.price,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CoinDetailScreen(coinId: coin.id),
+                      ),
+                    );
+                  },
                 );
               } else {
                 final item = trendingCoins![index].item!;
@@ -334,8 +343,14 @@ class _CoinSection extends StatelessWidget {
                   change: '${item.data?.usdChange.toStringAsFixed(2)}%',
                   isUp: (item.data?.usdChange ?? 0) >= 0,
                   imageUrl: item.large,
-                  // Trending API provides a link for sparkline, but fl_chart needs points.
-                  // For trending we'll use a mocked line or skip if data not available.
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CoinDetailScreen(coinId: item.id),
+                      ),
+                    );
+                  },
                 );
               }
             },
@@ -354,6 +369,7 @@ class _CoinCard extends StatelessWidget {
   final bool isUp;
   final String imageUrl;
   final List<double>? sparkline;
+  final VoidCallback onTap;
 
   const _CoinCard({
     required this.name,
@@ -363,68 +379,72 @@ class _CoinCard extends StatelessWidget {
     required this.isUp,
     required this.imageUrl,
     this.sparkline,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final color = isUp ? AppColors.priceUp : AppColors.priceDown;
-    return Container(
-      width: 160,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  price,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    price,
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: 20,
-                height: 20,
-                placeholder: (context, url) => const SizedBox(width: 20, height: 20),
-                errorWidget: (context, url, error) => const Icon(Icons.error, size: 20),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                symbol,
-                style: const TextStyle(color: AppColors.white, fontSize: 12),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                change,
-                style: TextStyle(color: color, fontSize: 10),
-              ),
-            ],
-          ),
-          const Spacer(),
-          SizedBox(
-            height: 35,
-            width: double.infinity,
-            child: sparkline != null
-                ? _SparklineChart(data: sparkline!, color: color)
-                : CustomPaint(painter: _MockChartPainter(color: color)),
-          ),
-        ],
+                CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  width: 20,
+                  height: 20,
+                  placeholder: (context, url) => const SizedBox(width: 20, height: 20),
+                  errorWidget: (context, url, error) => const Icon(Icons.error, size: 20),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  symbol,
+                  style: const TextStyle(color: AppColors.white, fontSize: 12),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  change,
+                  style: TextStyle(color: color, fontSize: 10),
+                ),
+              ],
+            ),
+            const Spacer(),
+            SizedBox(
+              height: 35,
+              width: double.infinity,
+              child: sparkline != null
+                  ? _SparklineChart(data: sparkline!, color: color)
+                  : CustomPaint(painter: _MockChartPainter(color: color)),
+            ),
+          ],
+        ),
       ),
     );
   }

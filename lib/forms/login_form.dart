@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../customWidget/input_field.dart';
 import '../customWidget/main_button.dart';
 import '../customWidget/social_buttons.dart';
-import '../screens/settings_screen.dart';
+import '../screens/main_nav_wrapper.dart';
 import '../core/constants/app_strings.dart';
 
 class LoginForm extends StatelessWidget {
@@ -33,7 +33,7 @@ class LoginForm extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
+                    builder: (context) => const MainNavWrapper(),
                   ),
                 );
               },

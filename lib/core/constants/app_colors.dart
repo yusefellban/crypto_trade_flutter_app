@@ -13,7 +13,16 @@ class AppColors {
   static const Color onboardingGradient2 = Color(0xFF111822);
   static const Color onboardingGradient3 = Color(0xFF0D1217);
   
+  // Financial Colors
+  static const Color priceUp = Color(0xFF60E0BA);
+  static const Color priceDown = Color(0xFFEB5757);
+  
+  // Header Gradients
+  static const Color headerGradientStart = Color(0xFF1A1F26);
+  static const Color headerGradientEnd = Color(0xFF11181F);
+  
   // Neutral Colors
   static const Color white = Colors.white;
+  static const Color grey = Color(0xFF9EA3A8);
   static const Color transparent = Colors.transparent;
 }

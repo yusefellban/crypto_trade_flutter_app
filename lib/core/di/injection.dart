@@ -9,6 +9,7 @@ import '../../logic/cubits/market_cubit.dart';
 import '../../logic/cubits/trades_cubit.dart';
 import '../../logic/cubits/coin_detail/coin_detail_cubit.dart';
 import '../../logic/cubits/auth/auth_cubit.dart';
+import '../../logic/cubits/wallet/wallet_cubit.dart';
 import '../services/preference_service.dart';
 import '../services/database_service.dart';
 
@@ -37,4 +38,5 @@ Future<void> init() async {
   sl.registerFactory(() => TradesCubit(sl()));
   sl.registerFactory(() => CoinDetailCubit(sl()));
   sl.registerFactory(() => AuthCubit(sl(), sl()));
+  sl.registerFactory(() => WalletCubit(sl()));
 }

@@ -8,6 +8,7 @@ import 'core/constants/app_colors.dart';
 import 'core/constants/app_strings.dart';
 import 'core/services/preference_service.dart';
 import 'logic/cubits/auth/auth_cubit.dart';
+import 'logic/cubits/wallet/wallet_cubit.dart';
 
 import 'core/di/injection.dart' as di;
 
@@ -36,6 +37,7 @@ class CryptoTradeApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => di.sl<AuthCubit>()),
+        BlocProvider(create: (context) => di.sl<WalletCubit>()..loadWallet()),
       ],
       child: MaterialApp(
         title: AppStrings.appTitle,

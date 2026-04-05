@@ -7,6 +7,8 @@ import '../core/constants/app_colors.dart';
 import '../core/di/injection.dart';
 import '../logic/cubits/market_cubit.dart';
 import '../logic/cubits/market_state.dart';
+import '../logic/cubits/wallet/wallet_cubit.dart';
+import '../logic/cubits/wallet/wallet_state.dart';
 import '../data/models/coin_model.dart';
 import 'profile_screen.dart';
 
@@ -290,6 +292,23 @@ class _CoinListItem extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: 8),
+          BlocBuilder<WalletCubit, WalletState>(
+            builder: (context, state) {
+              bool isInWallet = false;
+              if (state is WalletLoaded) {
+                isInWallet = state.coins.any((c) => c.id == coin.id);
+              }
+              return IconButton(
+                icon: Icon(
+                  isInWallet ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                  color: isInWallet ? AppColors.primary : AppColors.grey,
+                  size: 24,
+                ),
+                onPressed: () => context.read<WalletCubit>().toggleWallet(coin),
+              );
+            },
           ),
         ],
       ),
